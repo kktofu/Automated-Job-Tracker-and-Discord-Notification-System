@@ -29,31 +29,41 @@ public class JobSchedulerService {
 
     // Cron expression for 9 AM daily: "0 0 9 * * *"
     // For testing, run every 30 minutes: "0 0/30 * * * *"
-    @Scheduled(cron = "0 19 03 * * *")
+    @Scheduled(cron = "0 47 19 * * *")
     public void runDailyJobCheck() {
         System.out.println("Running daily job check...");
         List<Subscription> subscriptions = subscriptionRepository.findAll();
         System.out.println("目前共有 " + subscriptions.size() + " 筆訂閱");
 
         for (Subscription sub : subscriptions) {
-            List<JobScraperService.JobInfo> jobs = jobScraperService.searchJobs(sub.getKeyword());
+            try {
+                List<JobScraperService.JobInfo> jobs = jobScraperService.searchJobs(sub.getKeyword());
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("📢 New jobs found for: **").append(sub.getKeyword()).append("**\n");
+                StringBuilder sb = new StringBuilder();
+                sb.append("📢 New jobs found for: **").append(sub.getKeyword()).append("**\n");
 
-            int count = 0;
-            for (JobScraperService.JobInfo job : jobs) {
-                if (!jobHistoryRepository.existsById(job.id())) {
-                    sb.append("🔹 **").append(job.title()).append("** @ ").append(job.company()).append("\n")
-                      .append("🔗 <").append(job.link()).append(">\n\n");
+                int count = 0;
+                for (JobScraperService.JobInfo job : jobs) {
+                    if (job.id() == null) continue;
 
-                    jobHistoryRepository.save(new JobHistory(job.id()));
-                    count++;
+                    if (!jobHistoryRepository.existsById(job.id())) {
+
+                        sb.append("🔹 **").append(job.title())
+                                .append("** @ ").append(job.company()).append("\n")
+                                .append("🔗 <").append(job.link()).append(">\n\n");
+
+                        jobHistoryRepository.save(new JobHistory(job.id()));
+                        count++;
+                    }
+
+                    if (count >= 5) break; // 防止洗頻
                 }
-            }
 
-            if (count > 0) {
-                discordBotService.sendMessage(sub.getChannelId(), sb.toString());
+                if (count > 0) {
+                    discordBotService.sendMessage(sub.getChannelId(), sb.toString());
+                }
+            }catch (Exception e) {
+                System.out.println("處理訂閱失敗：" + sub.getKeyword());
             }
         }
     }
