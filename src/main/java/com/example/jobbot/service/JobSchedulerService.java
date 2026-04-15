@@ -29,7 +29,7 @@ public class JobSchedulerService {
 
     // Cron expression for 9 AM daily: "0 0 9 * * *"
     // For testing, run every 30 minutes: "0 0/30 * * * *"
-    @Scheduled(cron = "0 47 19 * * *")
+    @Scheduled(cron = "0 45 13 * * *")
     public void runDailyJobCheck() {
         System.out.println("Running daily job check...");
         List<Subscription> subscriptions = subscriptionRepository.findAll();
