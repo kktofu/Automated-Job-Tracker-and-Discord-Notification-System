@@ -7,7 +7,7 @@ Jobbot - 職缺通知機器人
   ---
 
   一、核心功能
-
+   * AI 履歷分析：上傳 PDF 履歷，利用 Google Gemini AI 自動分析內容，提取關鍵技能並主動推薦適合的職缺關鍵字。
    * 自動化爬取：利用 Selenium 與無頭瀏覽器 (Headless Chrome)
      模擬真人操作，準確抓取 104 動態加載的職缺資訊。
    * 定時通知：內建 Spring Scheduling，預設每天下午 21:45 (UTC+8)
@@ -16,6 +16,7 @@ Jobbot - 職缺通知機器人
        * /subscribe [關鍵字]：訂閱感興趣的職稱或技能。
        * /unsubscribe [關鍵字]：移除不再需要的訂閱。
        * /list：列出當前頻道所有已追蹤的關鍵字。
+       * /analyze [上傳 PDF]：上傳您的履歷，讓 AI 為您推薦職缺關鍵字並直接搜尋。
    * 排除重複：整合 H2 資料庫紀錄已發送過的
      jobId，確保同一個職缺不會重複通知，避免洗頻。
    * 流量保護：每個關鍵字每次更新僅發送前 5
@@ -27,6 +28,8 @@ Jobbot - 職缺通知機器人
 
    * 框架：Spring Boot 3.x / 4.0 (Java 21)
    * 機器人：JDA (Java Discord API) 5.0
+   * AI 分析：Google Gemini API (gemini-1.5-flash)
+   * PDF 解析：Apache PDFBox
    * 爬蟲：Selenium WebDriver + JSoup
    * 資料庫：Spring Data JPA + H2 Database (內嵌式，無需額外安裝)
    * 依賴管理：Maven
